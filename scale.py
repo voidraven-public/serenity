@@ -24,7 +24,7 @@ def scale_deployment(namespace, deployment_name, replicas):
 
 # Replace with your deployment details
 namespace = 'default'  # Namespace of the deployment
-deployment_name = 'your-deployment'  # Name of the deployment
+deployment_name = 'nginx'  # Name of the deployment
 replicas = 3  # Number of replicas to scale to
 
 scale_deployment(namespace, deployment_name, replicas)
