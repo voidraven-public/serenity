@@ -1,9 +1,9 @@
 import subprocess
 
-node_name = "my-node"
-grace_period = 300  # Adjust as needed
+node_name = "kind-worker"
+grace_period = 30  # Adjust as needed
 
-command = f"kubectl drain node {node_name} --grace-period={grace_period}"
+command = f"kubectl drain {node_name} --grace-period={grace_period} --delete-emptydir-data --ignore-daemonsets"
 process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 output, error = process.communicate()
 

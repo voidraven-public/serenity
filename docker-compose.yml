@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    image: httpd:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./my-web-app:/usr/local/apache2/htdocs/  # Mount your application code
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Set your MySQL root password
+      MYSQL_DATABASE: mydatabase         # Create a database
+      MYSQL_USER: myuser                 # Create a user
+      MYSQL_PASSWORD: mypassword         # Set user password
+    volumes:
+      - db-data:/var/lib/mysql
+
+volumes:
+  db-data:  # Persistent data for MySQL
