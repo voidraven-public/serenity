@@ -51,5 +51,16 @@ done
 ```
 
 ```
-kubectl get nodes --show-labels -o json | jq '.items[] | select(.metadata.labels | to_entries[] | select(.value | contains("wrk")))' 
+label_key="beta.kubernetes.io/arch"
+wildcard_pattern="arm"
+
+# Time to summon the nodes with our mystical wildcard!
+kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
+    .items[] | select(.metadata.labels[$key] | test($pattern)) | .metadata.name + " | " + .status.allocatable.memory[:-2]'
+
+echo "Node Name | Memory Allocatable (GB)"
+echo "----------|---------------------"
+kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
+    .items[] | select(.metadata.labels[$key] | test($pattern)) | .metadata.name + " | " + ( .status.allocatable.memory[:-2] | tonumber / 1000 / 1000 |floor | tostring)'
+
 ```
