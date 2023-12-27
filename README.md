@@ -22,4 +22,6 @@ echo "Node Name | Memory Requested (%)"
 echo "----------|---------------------"
 jq -r '.items[] | .metadata.name + " | " + (.status.allocatable.memory | tonumber / .status.capacity.memory * 100 | floor | tostring) + "%"' <<< "$nodes"
 
+jq -r '.items[] | .metadata.name + " | " + .status.allocatable.memory'  <<< "$nodes"
+
 ```
