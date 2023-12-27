@@ -26,55 +26,6 @@ jq -r '.items[] | .metadata.name + " | " + .status.allocatable.memory'  <<< "$no
 
 ```
 
-```
-#!/bin/bash
-
-# Grabbing the details of each node, it's like Pokémon but for memory stats
-kubectl get nodes -o json | jq '.items[] | {
-    name: .metadata.name,
-    memoryCapacity: .status.capacity.memory,
-    memoryAllocatable: .status.allocatable.memory
-}' | while read -r line; do
-    # It's like a memory party, and we're keeping track of who brings what
-    if echo $line | grep -q "name"; then
-        nodeName=$(echo $line | awk '{print $2}' | sed 's/"//g;s/,//g')
-    elif echo $line | grep -q "memoryCapacity"; then
-        memoryCapacity=$(echo $line | awk '{print $2}' | sed 's/"//g;s/Gi//g')
-    elif echo $line | grep -q "memoryAllocatable"; then
-        memoryAllocatable=$(echo $line | awk '{print $2}' | sed 's/"//g;s/Gi//g')
-
-        # The magical math part where we figure out the memory percentage
-        memoryRequested=$(bc <<< "scale=2; 100 - ($memoryAllocatable/$memoryCapacity)*100")
-        echo "Node: $nodeName, Memory % Requested: $memoryRequested%"
-    fi
-done
-```
-
-```
-label_key="beta.kubernetes.io/arch"
-wildcard_pattern="arm"
-
-# Time to summon the nodes with our mystical wildcard!
-kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
-    .items[] | select(.metadata.labels[$key] | test($pattern)) | .metadata.name + " | " + .status.allocatable.memory[:-2]'
-
-echo "Node Name | Memory Allocatable (GB)"
-echo "----------|---------------------"
-kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
-    .items[] | select(.metadata.labels[$key] | test($pattern)) | .metadata.name + " | " + ( .status.allocatable.memory[:-2] | tonumber / 1000 / 1000 |floor | tostring)'
-
-```
-
-```
-#!/bin/bash
-
-# The name of the node for which you want to calculate memory requests
-node_name="kind-worker"
-
-# Summoning the pod information from the specified node
-kubectl get pods --all-namespaces -o json --field-selector spec.nodeName=$node_name | jq '[.items[] | .spec.containers[] | .resources.requests.memory // "0Mi"] | map(gsub("Mi"; " * 1024 * 1024") | gsub("Gi"; " * 1024 * 1024 * 1024") | gsub("Ki"; " * 1024")) | join(" + ") | "0 + " + .' | bc
-
-```
 
 ```
 label_key="beta.kubernetes.io/arch"
@@ -95,12 +46,14 @@ POD_MEMORY_REQUESTED=`kubectl get pods --all-namespaces -o jsonpath='{.items[?(@
         else if(tolower($1) ~ /gi$/){sum += int($1)*1024} 
         else if(tolower($1) ~ /ti$/){sum += int($1)*1048576} 
         else{sum += int($1)/1048576}
-    }END{print sum "Mi"}'`
+    }END{print sum}'`
 
 NODE_MEMORY_CAPACITY=`kubectl get node "$NODE_NAME" -o jsonpath='{.status.capacity.memory}' | \
-    awk '{print int($1/1024) "Mi"}'`
+    awk '{print int($1/1024)}'`
 
-echo "$NODE_NAME|$NODE_MEMORY_CAPACITY|$POD_MEMORY_REQUESTED"
+result=$(echo "scale=2; $POD_MEMORY_REQUESTED / $NODE_MEMORY_CAPACITY" | bc)
+percentage=$(echo "scale=2; $result * 100" | bc)
+echo "$NODE_NAME|$NODE_MEMORY_CAPACITY Mi|$POD_MEMORY_REQUESTED Mi|${percentage}%"
 
 done
 ```
