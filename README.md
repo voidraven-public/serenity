@@ -53,7 +53,7 @@ POD_MEMORY_REQUESTED=`kubectl get pods --all-namespaces -o jsonpath='{.items[?(@
 NODE_MEMORY_CAPACITY=`kubectl get node "$NODE_NAME" -o jsonpath='{.status.capacity.memory}' | \
     awk '{print int($1/1024)}'`
 
-NICE_NODE_NAME=`kubectl get nodes $NODE_NAME -o jsonpath='{.items[*].metadata.label.name}'`
+NICE_NODE_NAME=`kubectl get nodes $NODE_NAME -o jsonpath='{.items[*].metadata.labels.name}'`
 
 result=$(echo "scale=2; $POD_MEMORY_REQUESTED / $NODE_MEMORY_CAPACITY" | bc)
 percentage=$(echo "scale=2; $result * 100" | bc)
