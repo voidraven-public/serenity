@@ -1,5 +1,4 @@
 # k8s
-# k8s
 
 ###
 ```
@@ -30,6 +29,9 @@ jq -r '.items[] | .metadata.name + " | " + .status.allocatable.memory'  <<< "$no
 ```
 label_key="beta.kubernetes.io/arch"
 wildcard_pattern="arm"
+
+echo "NODE_NAME|NODE_MEMORY_CAPACITY Mi|POD_MEMORY_REQUESTED Mi|Percentage"
+
 
 NODES=(`kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
     .items[] | select(.metadata.labels[$key] | test($pattern)) | .metadata.name '`)
