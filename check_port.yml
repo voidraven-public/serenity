@@ -1,0 +1,33 @@
+---
+- hosts: localhost
+  tasks:
+    # Choose one of the following methods for port checking:
+
+    # Method 1: Using the wait_for module
+    - name: Check if port 80 is open using wait_for
+      wait_for:
+        port: 80
+        host: localhost
+        state: started
+        timeout: 30
+      register: port_check
+
+    # Method 2: Using the community.general.listen_ports_facts module
+    - name: Gather facts about open ports
+      community.general.listen_ports_facts:
+      register: port_facts
+
+    # Method 3: Using the shell module with netcat
+    - name: Check if port 80 is open using netcat
+      shell: nc -zv localhost 80
+      register: port_check
+      failed_when: false  # Ignore errors for conditional handling
+
+    # Fail the playbook if the port is not open (applicable to all methods)
+    - name: Fail the playbook if port 80 is not open
+      fail:
+        msg: "Port 80 is not open on localhost"
+      when:
+        - (method == "wait_for") and not port_check.success  # For wait_for
+        - (method == "listen_ports_facts") and ":80" not in port_facts.ansible_facts.tcp_listen  # For listen_ports_facts
+        - (method == "netcat") and port_check.rc != 0  # For netcat

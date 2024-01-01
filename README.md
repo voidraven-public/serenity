@@ -30,7 +30,7 @@ jq -r '.items[] | .metadata.name + " | " + .status.allocatable.memory'  <<< "$no
 label_key="beta.kubernetes.io/arch"
 wildcard_pattern="arm"
 
-echo "NODE_NAME|NODE_MEMORY_CAPACITY Mi|POD_MEMORY_REQUESTED Mi|Percentage"
+echo "NICE_NODE_NAME|NODE_NAME|NODE_MEMORY_CAPACITY Mi|POD_MEMORY_REQUESTED Mi|Percentage"
 
 
 NODES=(`kubectl get nodes -o json | jq --arg key "$label_key" --arg pattern "$wildcard_pattern" '
@@ -53,7 +53,7 @@ POD_MEMORY_REQUESTED=`kubectl get pods --all-namespaces -o jsonpath='{.items[?(@
 NODE_MEMORY_CAPACITY=`kubectl get node "$NODE_NAME" -o jsonpath='{.status.capacity.memory}' | \
     awk '{print int($1/1024)}'`
 
-NICE_NODE_NAME=`kubectl get nodes $NODE_NAME -o jsonpath='{.items[*].metadata.labels.name}'`
+NICE_NODE_NAME=`kubectl get nodes $NODE_NAME -o jsonpath='{.metadata.labels.name}'`
 
 result=$(echo "scale=2; $POD_MEMORY_REQUESTED / $NODE_MEMORY_CAPACITY" | bc)
 percentage=$(echo "scale=2; $result * 100" | bc)
