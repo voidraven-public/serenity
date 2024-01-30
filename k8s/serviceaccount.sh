@@ -5,3 +5,13 @@ kubectl config set-credentials <your-context-name> --token=<your-token>
 kubectl config set-context <your-context-name> --user=<your-context-name> --cluster=<your-cluster-name>
 kubectl config use-context <your-context-name>
 kubectl get pods
+
+
+
+kubectl create namespace scaffold
+kubectl create serviceaccount svcscaffold --namespace scaffold
+kubectl create rolebinding svcscaffold-admin --namespace scaffold --clusterrole=cluster-admin --serviceaccount=scaffold:svcscaffold
+kubectl create token --serviceaccount=scaffold/svcscaffold
+kubectl get secrets --namespace scaffold -o jsonpath='{.items[?(@.metadata.annotations["kubernetes.io/service-account.name"] == "svcscaffold")].metadata.name}'
+kubectl get secret <secret-name> --namespace scaffold -o jsonpath='{.data.token}' | base64 -d
+
