@@ -1,0 +1,10 @@
+- hosts: remote_servers  # Replace with your target server(s)
+  tasks:
+    - name: Copy local file to remote server
+      copy:
+        src: /path/to/local/file.rpm  # Replace with your file path
+        dest: /tmp/file.rpm
+    - name: Install the file using yum
+      yum:
+        name: /tmp/file.rpm
+        state: present
