@@ -15,3 +15,22 @@ for project_name in response['projects']:
 
     print(f"CodeBuild Project Name: {project_name}")
     print(f"Role ARN: {role_arn}\n")
+
+# with pagninator
+# Create a Boto3 CodeBuild client
+codebuild = boto3.client('codebuild')
+
+# Initialize the CodeBuild paginator
+paginator = codebuild.get_paginator('list_projects')
+
+# Define any additional parameters or filters if needed
+# For example:
+# params = {'sortOrder': 'ASCENDING'}
+
+# Use a generator to paginate through the results
+for page in paginator.paginate():    
+    projects = page.get('projects', [])
+    
+    # Process each project in the current page
+    for project in projects:
+        print(f"Project Name: {project}")
