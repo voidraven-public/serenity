@@ -1,27 +1,48 @@
 import boto3
 
-# Create an IAM client
-iam = boto3.client('iam')
+iam_client = boto3.client('iam')
 
-# List all roles
-paginator = iam.get_paginator('list_roles')
+def list_roles_and_policies(exclude_aws=True):
+    """Lists IAM roles and their attached inline policies, potentially excluding roles starting with 'AWS'.
 
-for page in paginator.paginate():
-    for role in page['Roles']:
-        role_name = role['RoleName']
+    Args:
+        exclude_aws (bool, optional): Whether to skip roles starting with 'AWS'. Defaults to True.
 
-        # List inline policies for the role
-        inline_policies = iam.list_role_policies(RoleName=role_name)
+    Returns:
+        list: A list of dictionaries, where each dictionary contains:
+            - 'RoleName': The name of the IAM role.
+            - 'InlinePolicies': A list of dictionaries, where each dictionary contains:
+                - 'PolicyName': The name of the inline policy.
+                - 'PolicyDocument': The JSON-formatted policy document.
+    """
 
-        # Print role name and attached inline policies
-        print(f"Role: {role_name}")
-        for policy in inline_policies['PolicyNames']:
-            print(f"  - Inline Policy: {policy}")
+    paginator = iam_client.get_paginator('list_roles')
+    roles = paginator.paginate().build_complete_result()['Roles']
 
-        # (Optional) Get full inline policy document
-        for policy in inline_policies['PolicyNames']:
-            policy_document = iam.get_role_policy(RoleName=role_name, PolicyName=policy)
-            print(f"    Policy document: {policy_document['PolicyDocument']}")
-            print("----")
+    filtered_roles = []
+    for role in roles:
+        if exclude_aws and role['RoleName'].startswith('AWS'):
+            continue
 
-        print("")
+        inline_policies = []
+        paginator = iam_client.get_paginator('list_role_policies')
+        for page in paginator.paginate(RoleName=role['RoleName']):
+            for policy_name in page['PolicyNames']:
+                policy_document = iam_client.get_role_policy(RoleName=role['RoleName'], PolicyName=policy_name)['PolicyDocument']
+                inline_policies.append({'PolicyName': policy_name, 'PolicyDocument': policy_document})
+
+        filtered_roles.append({'RoleName': role['RoleName'], 'InlinePolicies': inline_policies})
+
+    return filtered_roles
+
+if __name__ == '__main__':
+    roles_and_policies = list_roles_and_policies()
+
+    # Print role names and policy details
+    for role in roles_and_policies:
+        print(f"Role Name: {role['RoleName']}")
+        for policy in role['InlinePolicies']:
+            print(f"- Policy Name: {policy['PolicyName']}")
+            print(f"  Policy Document: {policy['PolicyDocument']}")
+            print("")  # Add an empty line for readability
+
