@@ -11,7 +11,7 @@ kubectl get pods
 kubectl create namespace scaffold
 kubectl create serviceaccount svcscaffold --namespace scaffold
 kubectl create rolebinding svcscaffold-admin --namespace scaffold --clusterrole=cluster-admin --serviceaccount=scaffold:svcscaffold
-kubectl create token --serviceaccount=scaffold/svcscaffold
+kubectl create secret generic svc-account-token-scaffold --from-literal=token=$(kubectl create token --serviceaccount=scaffold/svcscaffold) -n scaffold
 kubectl get secrets --namespace scaffold -o jsonpath='{.items[?(@.metadata.annotations["kubernetes.io/service-account.name"] == "svcscaffold")].metadata.name}'
 kubectl get secret <secret-name> --namespace scaffold -o jsonpath='{.data.token}' | base64 -d
 
