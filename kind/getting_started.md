@@ -26,11 +26,9 @@ echo "Login: admin / $APP_PASSWORD"
 kubectl port-forward --namespace default svc/nextcloud 8081:8080
 ```
 
-nextcloud url http://127.0.0.1
-
-user admin
-
-password above from APP_PASSWORD
+nextcloud url http://127.0.0.1:8081
+user: admin
+password: above from APP_PASSWORD
 
 # Show pods
 ```
