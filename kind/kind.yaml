@@ -1,0 +1,35 @@
+
+# apiVersion: kind.x-k8s.io/v1alpha1
+# kind: Cluster
+# metadata:
+#   name: my-kind-cluster
+# spec:
+#   image: kindest/node:latest
+#   config:
+#     kubeletConfig:
+#       nodeLabels:
+#         app: my-app
+#     podCidr: 10.32.0.0/16
+#     apiServer:
+#       extraArgs:
+#         authorization-mode: AlwaysAllow
+#     etcd:
+#       storageClass: default
+#     nodes: 2
+
+
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      - containerPort: 80
+        hostPort: 80
+        protocol: TCP

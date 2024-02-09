@@ -1,0 +1,1 @@
+write me a script to configure kind cluster with ports for nginx ingress
