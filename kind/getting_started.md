@@ -50,6 +50,8 @@ wordpress-mariadb-0          1/1     Running   0          50m
 
 https://k3s.io/
 
+Note: Install docker inside each VM.
+
 ## On VM1
 1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
 2. Run server
