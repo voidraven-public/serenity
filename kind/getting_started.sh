@@ -17,9 +17,11 @@ helm repo update
 helm install nextcloud nextcloud/nextcloud
 export APP_HOST=127.0.0.1
 export APP_PASSWORD=$(kubectl get secret --namespace default nextcloud -o jsonpath="{.data.nextcloud-password}" | base64 --decode)
-echo $APP_PASSWORD
+echo "Login: admin / $APP_PASSWORD"
 kubectl port-forward --namespace default svc/nextcloud 8081:8080
-
+# nextcloud url http://127.0.0.1
+# user admin
+# password above from APP_PASSWORD
 
 # delete kind cluster
 kind delete cluster
