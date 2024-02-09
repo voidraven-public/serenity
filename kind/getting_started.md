@@ -45,3 +45,27 @@ wordpress-mariadb-0          1/1     Running   0          50m
 
 `kind delete cluster`
 
+
+# Set up K3s On VMS (3)
+
+https://k3s.io/
+
+## On VM1
+1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
+2. Run server
+```
+sudo k3s server &
+# Kubeconfig is written to /etc/rancher/k3s/k3s.yaml
+sudo k3s kubectl get node
+```
+
+## On VM2
+1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
+2. # NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
+`sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}`
+
+## On VM3
+1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
+2. # NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
+`sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}`
+
