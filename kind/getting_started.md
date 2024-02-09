@@ -61,11 +61,16 @@ sudo k3s kubectl get node
 
 ## On VM2
 1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
-2. # NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
-`sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}`
+2. Run Agent
+```
+# NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
+sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}
+```
 
 ## On VM3
 1. Download K3s - latest release: x86_64, ARMv7, and ARM64 are supported. https://github.com/k3s-io/k3s/releases/latest
-2. # NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
-`sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}`
-
+2. Run Agent
+```
+# NODE_TOKEN comes from /var/lib/rancher/k3s/server/node-token on your server
+sudo k3s agent --server https://myserver:6443 --token ${NODE_TOKEN}
+```
