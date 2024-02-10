@@ -1,6 +1,9 @@
 # k8s
 
 ###
+
+`kubectl get nodes as json and use jq to parse out nodes with a label state that matches cali`
+
 ```
 # memory percentage requested for each node in a Kubernetes cluster
 kubectl describe nodes | grep -A 3 "Resource .*Requests .*Limits"
