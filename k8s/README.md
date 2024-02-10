@@ -2,7 +2,10 @@
 
 ###
 
-`kubectl get nodes as json and use jq to parse out nodes with a label state that matches cali`
+```
+# kubectl get nodes as json and use jq to parse out nodes with a label state that matches cali`
+kubectl get nodes -o json | jq '.items[] | select(.metadata.labels."kubernetes.io/hostname" | contains("cali"))'
+```
 
 ```
 # memory percentage requested for each node in a Kubernetes cluster
