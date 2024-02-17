@@ -45,6 +45,14 @@ wordpress-mariadb-0          1/1     Running   0          50m
 
 `kind delete cluster`
 
+# OpenLens GUI for Kubernetes
+
+```
+# https://www.virtualizationhowto.com/2022/11/openlens-kubernetes-ide-opensource-lens-desktop/
+brew install openlens
+https://www.youtube.com/watch?v=dKOdT91USwM
+```
+
 
 # Set up K3s On VMS (3)
 
