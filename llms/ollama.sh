@@ -1,3 +1,4 @@
+ollama pull mistral:instruct
 ollama pull codellama:7b
 ollama pull codellama:13b
 ollama pull codellama:34b

@@ -1,5 +1,8 @@
 # Kind
-`kind create cluster`
+```
+kind delete cluster 
+kind create cluster --config kind.yaml
+```
 
 # Wordpress
 ```

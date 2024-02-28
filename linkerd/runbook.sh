@@ -4,13 +4,43 @@ linkerd install --crds | kubectl apply -f -
 # install the Linkerd control plane once the CRDs have been installed
 linkerd install | kubectl apply -f -
 
-
 kubectl create namespace mesh1
 kubectl create namespace mesh2
 kubectl create namespace nomesh1
 
-
 kubectl apply -f - <<EOF
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mesh1
+  namespace: mesh1
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: mesh1
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mesh1
+  namespace: mesh1
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+  sessionAffinity: None
+  type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -58,6 +88,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: nginx-config
+  namespace: mesh1
 data:
   default.html: |
     <!DOCTYPE html>
@@ -278,11 +309,14 @@ kubectl get service nginx -n mesh1 -o jsonpath='{.spec.clusterIP}' | xargs -I {i
 kubectl get service nginx -n mesh2 -o jsonpath='{.spec.clusterIP}' | xargs -I {ip} sed "s/SERVICE_NAME/{ip}/" linkerd-policy.yaml -i > mesh2-policy.yaml
 
 kubectl annotate namespace mesh2 "linkerd.io/inject=enabled"
+kubectl annotate namespace default "config.linkerd.io/default-inbound-policy=all-authenticated"
 kubectl annotate namespace mesh1 "config.linkerd.io/default-inbound-policy=all-authenticated"
 kubectl annotate namespace mesh1 "config.linkerd.io/default-inbound-policy=deny"
 
 kubectl annotate deploy nginx -n mesh2 "linkerd.io/inject=enabled"
 kubectl annotate deploy nginx -n mesh1 "config.linkerd.io/default-inbound-policy=all-authenticated"
+kubectl annotate deploy nginx -n default "config.linkerd.io/default-inbound-policy=all-authenticated"
+kubectl annotate deploy ingress-nginx-controller -n ingress-nginx "linkerd.io/inject=enabled"
 
 
 linkerd.io/inject: enabled
