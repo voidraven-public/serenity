@@ -1,0 +1,7 @@
+plan
+.terraform
+.terraform.lock.hcl
+.terraform.tfstate
+.DS_Store
+*.key
+*.crt
